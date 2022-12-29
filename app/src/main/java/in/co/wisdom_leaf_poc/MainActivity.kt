@@ -2,10 +2,12 @@ package `in`.co.wisdom_leaf_poc
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 
-class SplashActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_splash)
+        installSplashScreen()
+        setContentView(R.layout.activity_main)
     }
 }
