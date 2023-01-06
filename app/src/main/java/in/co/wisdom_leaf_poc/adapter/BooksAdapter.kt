@@ -2,15 +2,18 @@ package `in`.co.wisdom_leaf_poc.adapter
 
 import `in`.co.wisdom_leaf_poc.databinding.BooksListRowBinding
 import `in`.co.wisdom_leaf_poc.model.Author
+import android.R
 import android.annotation.SuppressLint
 import android.content.ContentValues.TAG
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.view.ContextThemeWrapper
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-
+import com.google.android.material.internal.ContextUtils.getActivity
 
 
 class BooksAdapter: RecyclerView.Adapter<BooksAdapter.BookViewHolder>() {
@@ -25,6 +28,7 @@ class BooksAdapter: RecyclerView.Adapter<BooksAdapter.BookViewHolder>() {
         return BookViewHolder(binding)
     }
 
+    @SuppressLint("RestrictedApi")
     override fun onBindViewHolder(holder: BookViewHolder, position: Int) {
         val book = bookList[position]
         holder.binding.title.text = book.author
@@ -37,11 +41,18 @@ class BooksAdapter: RecyclerView.Adapter<BooksAdapter.BookViewHolder>() {
         Glide.with(holder.itemView.context)
             .load(url)
             .diskCacheStrategy(DiskCacheStrategy.ALL) // Store images in cache to load faster
-            .thumbnail()
-            .centerCrop()
             .into(holder.binding.imageview)
 
+        // Display the description dialog
+        holder.itemView.setOnClickListener {
+            val builder = AlertDialog.Builder(holder.itemView.context)
 
+            builder.setTitle( holder.binding.title.text)
+            builder.setMessage( holder.binding.description.text)
+            builder.setCancelable(true)
+            val alert11: AlertDialog = builder.create()
+            alert11?.show()
+        }
     }
 
     override fun getItemCount(): Int {
