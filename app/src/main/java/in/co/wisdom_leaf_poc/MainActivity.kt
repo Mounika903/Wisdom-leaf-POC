@@ -14,9 +14,11 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.ViewModelProvider
 
 class MainActivity : AppCompatActivity() {
-    lateinit var viewmodel: BooksViewModel
+
+    private var pageNumber = 1
+    private lateinit var viewModel: BooksViewModel
     private val adapter = BooksAdapter()
-    lateinit var binding: ActivityMainBinding
+    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,18 +30,18 @@ class MainActivity : AppCompatActivity() {
         val retrofitService = RetrofitService.getInstance()
         val repository = Repository(retrofitService)
 
-        viewmodel = ViewModelProvider(
+        viewModel = ViewModelProvider(
             this,
             BooksViewModelFactory(repository)
         ).get(BooksViewModel::class.java)
         binding.recyclerview.adapter = adapter
 
-        viewmodel.bookList.observe(this)
+        viewModel.bookList.observe(this)
         {
             adapter.setBooks(it)
         }
 
-        viewmodel.errorMessage.observe(this) {
+        viewModel.errorMessage.observe(this) {
             Toast.makeText(
                 this,
                 "Error loading messages. Please reload this page.",
@@ -47,12 +49,23 @@ class MainActivity : AppCompatActivity() {
             ).show()
         }
 
-        viewmodel.loading.observe(this) {
-            if (it)
+        viewModel.loading.observe(this) {
+            if (it) {
                 binding.progressDialog.visibility = View.VISIBLE
-            else
+            } else {
                 binding.progressDialog.visibility = View.GONE
+                binding.swipe.isRefreshing = false
+            }
         }
-        viewmodel.getBooks()
+        viewModel.getBooks(pageNumber)
+
+        /**
+         * Swipe refresh listener to load next page results from the API call
+         */
+        binding.swipe.setOnRefreshListener {
+            pageNumber++
+            viewModel.getBooks(pageNumber)
+        }
     }
+
 }

@@ -2,14 +2,20 @@ package `in`.co.wisdom_leaf_poc.adapter
 
 import `in`.co.wisdom_leaf_poc.databinding.BooksListRowBinding
 import `in`.co.wisdom_leaf_poc.model.Author
+import android.annotation.SuppressLint
+import android.content.ContentValues.TAG
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 
-class BooksAdapter : RecyclerView.Adapter<BooksAdapter.BookViewHolder>() {
 
-    var booklist = mutableListOf<Author>()
+
+class BooksAdapter: RecyclerView.Adapter<BooksAdapter.BookViewHolder>() {
+
+    private var bookList = mutableListOf<Author>()
 
     class BookViewHolder(val binding: BooksListRowBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -20,20 +26,31 @@ class BooksAdapter : RecyclerView.Adapter<BooksAdapter.BookViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: BookViewHolder, position: Int) {
-        val book = booklist[position]
+        val book = bookList[position]
         holder.binding.title.text = book.author
         holder.binding.description.text = book.download_url
-        Glide.with(holder.itemView)
-            .load("https://image.tmdb.org/t/p/w500" + booklist[position])
+
+        val url: String =  book.download_url
+        Log.d(TAG, "onBindViewHolder: URL: $url")
+
+        // Load images using Glide library
+        Glide.with(holder.itemView.context)
+            .load(url)
+            .diskCacheStrategy(DiskCacheStrategy.ALL) // Store images in cache to load faster
+            .thumbnail()
+            .centerCrop()
             .into(holder.binding.imageview)
+
+
     }
 
     override fun getItemCount(): Int {
-        return booklist.size
+        return bookList.size
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun setBooks(book: List<Author>) {
-        this.booklist = book.toMutableList()
-        notifyDataSetChanged()
+        this.bookList = book.toMutableList()
+        notifyDataSetChanged() // List refresh with the latest results
     }
 }

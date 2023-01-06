@@ -9,7 +9,7 @@ import kotlinx.coroutines.*
 class BooksViewModel constructor(private val repository: Repository) : ViewModel() {
 
     val bookList = MutableLiveData<List<Author>>()
-    var handlejob: Job? = null
+    private var handlejob: Job? = null
     val errorMessage = MutableLiveData<String>()
     val loading = MutableLiveData<Boolean>()
 
@@ -32,9 +32,9 @@ class BooksViewModel constructor(private val repository: Repository) : ViewModel
     /**
      * To fetch the books from the AP call using Coroutines
      */
-    fun getBooks() {
+    fun getBooks(pageNumber: Int) {
         handlejob = CoroutineScope(Dispatchers.IO + exceptionHandler).launch {
-            val response = repository.getBooks()
+            val response = repository.getBooks(pageNumber)
             withContext(Dispatchers.Main)
             {
                 if (response.isSuccessful) {
